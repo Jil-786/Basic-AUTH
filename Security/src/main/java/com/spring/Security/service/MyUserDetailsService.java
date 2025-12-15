@@ -23,7 +23,7 @@ public class MyUserDetailsService implements UserDetailsService {
 		// TODO Auto-generated method stub
 		UserEntity user = userRepo.findByUsername(username);
 		if(user==null) {
-			System.out.println("User not found in DB");
+			//System.out.println("User not found in DB");
 			throw new UsernameNotFoundException("User not found");
 		}
 		return new UserPrincipal(user);

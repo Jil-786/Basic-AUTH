@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("users")
 public class UserEntity {
+	
 	private String username;
 	private String password;
 	public String getUsername() {

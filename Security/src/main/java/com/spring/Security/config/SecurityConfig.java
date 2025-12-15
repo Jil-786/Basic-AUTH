@@ -13,10 +13,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
+	
+	
+	@Autowired
+	private JWTFilter jwtFilter;
 	
 	@Bean
 	public SecurityFilterChain customChain(HttpSecurity security) throws Exception {
@@ -24,7 +29,8 @@ public class SecurityConfig {
 		security.csrf(customizer->customizer.disable()); 
 		// authorizing because we can authorize any requests
 		security.authorizeHttpRequests(request->request 
-				.requestMatchers("/signup").permitAll()   // 👈 allow signup
+				.requestMatchers("/signup","/login")
+				.permitAll()   // 👈 allow signup & login
 	            .anyRequest().authenticated() );
 		// for form login access to the browse
 		//security.formLogin(Customizer.withDefaults());
@@ -32,15 +38,20 @@ public class SecurityConfig {
 		security.httpBasic(Customizer.withDefaults());
 		//for Multiple SessionIds for each Tab
 		security.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		security.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 		return security.build();
 	}
+	// for Basic Authentication
 	@Bean
     public PasswordEncoder passwordEncoder() {
 	//return NoOpPasswordEncoder.getInstance(); 
       return new BCryptPasswordEncoder();
     }
+
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	// for basic Auth
 	  @Bean
 	    public AuthenticationManager authenticationManager(
 	            HttpSecurity http,
@@ -58,6 +69,12 @@ public class SecurityConfig {
 	    }
 	
 	
+	
+	// for JWT 
+//	@Bean 
+//	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+//		return config.getAuthenticationManager();		
+//	}
 	
 	
 	
